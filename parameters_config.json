@@ -1,0 +1,13 @@
+{
+	"epochs": 2,
+	"batch_size": 16,
+	"test_size": 0.2,
+	"dropout_keep_prob": 0.4,
+	"hidden_unit": 200,
+	"number_of_classes":2,
+	"dl_network":"VGG16",
+	"activation_function": "relu",
+	"activation_function_output layer": "softmax",
+	"loss_function": "categorical_crossentropy"
+
+}
