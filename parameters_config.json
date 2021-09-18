@@ -9,5 +9,4 @@
 	"activation_function": "relu",
 	"activation_function_output layer": "softmax",
 	"loss_function": "categorical_crossentropy"
-
 }

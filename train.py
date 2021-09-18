@@ -37,7 +37,6 @@ import time
 import sys
 import json
 
-
 # colors for terminal
 CRED = '\033[91m'
 CREDEND = '\033[0m'
