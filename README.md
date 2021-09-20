@@ -1,3 +1,3 @@
-# d-LOOK (deep-Look)
+## d-LOOK (deep-Look)
 
-##Supervised Learning Deep Learning Models
+### Supervised Learning Deep Learning Models
