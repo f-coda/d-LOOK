@@ -19,7 +19,6 @@ from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.utils import to_categorical
-from keras.utils import np_utils
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.model_selection import train_test_split
@@ -35,7 +34,8 @@ import os
 import time
 import sys
 import json
-import logging
+
+
 
 # colors for terminal
 CRED = '\033[91m'
