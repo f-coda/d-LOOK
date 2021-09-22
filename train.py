@@ -103,9 +103,9 @@ trainAug = ImageDataGenerator(rotation_range=30, width_shift_range=0.1,
                               height_shift_range=0.1, shear_range=0.2, zoom_range=0.2,
                               horizontal_flip=True, fill_mode="nearest")
 
-dl_network = params["dl_network"]
+
 # load the DL network, ensuring the head FC layer sets are left
-baseModel = eval(dl_network)(weights="imagenet", include_top=False,
+baseModel = eval(params["dl_network"])(weights="imagenet", include_top=False,
                              input_tensor=Input(shape=(224, 224, 3)))
 
 # construct the head of the model that will be placed on top of the the base model
@@ -126,7 +126,7 @@ for layer in baseModel.layers:
 
 # compile our model
 print(CRED +"[INFO] compiling model..."+CREDEND)
-opt = Adam(lr=INIT_LR, decay=INIT_LR / EPOCHS)
+opt = eval(params["optimizer"])(lr=INIT_LR, decay=INIT_LR / EPOCHS)
 model.compile(loss=params["loss_function"], optimizer=opt,
               metrics=["accuracy"])
 
