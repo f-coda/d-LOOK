@@ -33,11 +33,13 @@ In `parameters_config.json` file, several variables can be configured
 
 
 ##### Example Usage
-
 ```shell
-python train.py --dataset [dataset_path] --plot [plotname (.pdf)] --model [modelname (.model)]
+python train.py --d [dataset_path] --m [modelname (.model)] --c [config file]
+```
+```shell
+Example:  python train.py --dataset /home/antonis/repos/d-LOOK/4hours/classes --model testmodel.model -c parameters_config.json
 ```
 
-```shell
-Example:  python train.py --dataset /home/antonis/repos/d-LOOK/4hours/classes --model testmodel.model
-```
+
+
+Inside `tests` folder

@@ -1,3 +1,4 @@
+from __future__ import print_function
 from itertools import cycle
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.applications import VGG16
@@ -35,8 +36,6 @@ import time
 import sys
 import json
 
-
-
 # colors for terminal
 CRED = '\033[91m'
 CREDEND = '\033[0m'
@@ -45,21 +44,11 @@ CREDEND = '\033[0m'
 ap = argparse.ArgumentParser()
 ap.add_argument("-d", "--dataset", required=True, help="path to input dataset")
 ap.add_argument("-m", "--model", type=str, help="path and name to output model")
+ap.add_argument("-c", "--configFile", type=str, help="path and name to the configuration file")
 args = vars(ap.parse_args())
 
-parameter_file = "parameters_config.json"
-params = json.loads(open(parameter_file).read())
-
-# argument size check
-if len(sys.argv) < 4:
-    print(CRED + """\
-\nWrong number of arguments
-
-Usage: python train_network --dataset [dataset_path] --plot [plotname (.pdf)] --model [modelname (.model)]
-
-Example:  python train.py --dataset /home/antonis/repos/d-LOOK/4hours/classes --model testmodel.model -c parameters_config.json
-""" + CREDEND)
-    sys.exit(0)
+params = args["configFile"]
+params = json.loads(open(params).read())
 
 # initialize the initial learning rate, number of epochs to train for, and batch size
 INIT_LR = 1e-3
@@ -69,7 +58,7 @@ BS = params["batch_size"]
 # grab the list of images in our dataset directory, then initialize
 # the list of data (i.e., images) and class images
 start = time.time()
-print("[INFO] loading images...")
+print(CRED + "[INFO] loading images..." + CREDEND)
 imagePaths = list(paths.list_images(args["dataset"]))
 data = []
 labels = []
@@ -102,7 +91,7 @@ else:
     labels = lb.fit_transform(labels)
 
 # print the list of classes
-#print("List of classes", list(lb.classes_))
+# print("List of classes", list(lb.classes_))
 
 # partition the data into training and testing splits using 80% of
 # the data for training and the remaining 20% for testing
@@ -114,11 +103,10 @@ trainAug = ImageDataGenerator(rotation_range=30, width_shift_range=0.1,
                               height_shift_range=0.1, shear_range=0.2, zoom_range=0.2,
                               horizontal_flip=True, fill_mode="nearest")
 
-
 dl_network = params["dl_network"]
 # load the DL network, ensuring the head FC layer sets are left
 baseModel = eval(dl_network)(weights="imagenet", include_top=False,
-                  input_tensor=Input(shape=(224, 224, 3)))
+                             input_tensor=Input(shape=(224, 224, 3)))
 
 # construct the head of the model that will be placed on top of the the base model
 headModel = baseModel.output
@@ -137,13 +125,13 @@ for layer in baseModel.layers:
     layer.trainable = False
 
 # compile our model
-print("[INFO] compiling model...")
+print(CRED +"[INFO] compiling model..."+CREDEND)
 opt = Adam(lr=INIT_LR, decay=INIT_LR / EPOCHS)
 model.compile(loss=params["loss_function"], optimizer=opt,
               metrics=["accuracy"])
 
 # train the head of the network
-print("[INFO] training head...")
+print(CRED +"[INFO] training head..."+CREDEND)
 H = model.fit_generator(
     trainAug.flow(trainX, trainY, batch_size=BS),
     steps_per_epoch=len(trainX) // BS,
@@ -152,14 +140,14 @@ H = model.fit_generator(
     epochs=EPOCHS)
 
 # make predictions on the testing set
-print("[INFO] evaluating network...")
+print(CRED +"\n [INFO] evaluating network..."+CREDEND)
 predIdxs = model.predict(testX, batch_size=BS)
 
 # for each image in the testing set we need to find the index of the label with corresponding largest predicted probability
 predIdxs = np.argmax(predIdxs, axis=1)
 
 # show a nicely formatted classification report
-print(classification_report(testY.argmax(axis=1), predIdxs))
+print("\n\n" + classification_report(testY.argmax(axis=1), predIdxs) + "\n\n")
 
 # compute the confusion matrix and and use it to derive the raw accuracy, sensitivity, and specificity
 cm = confusion_matrix(testY.argmax(axis=1), predIdxs)
@@ -167,34 +155,30 @@ total = sum(sum(cm))
 acc = (cm[0, 0] + cm[1, 1]) / total
 sensitivity = cm[0, 0] / (cm[0, 0] + cm[0, 1])
 specificity = cm[1, 1] / (cm[1, 0] + cm[1, 1])
+true_positive = np.diag(cm)
+false_positive = np.sum(cm, axis=0) - true_positive
+false_negative = np.sum(cm, axis=1) - true_positive
+true_negative = cm.sum() - (false_positive + false_negative + true_positive)
 
-print("[INFO] More results...")
-print("\n")
-print("Confusion Matrix", cm)
-tp = np.diag(cm)
-print("True positive (for each class):", tp)
-fp = np.sum(cm, axis=0) - tp
-print("False positive (for each class):", fp)
-fn = np.sum(cm, axis=1) - tp
-print("False negative (for each class):", fn)
-tn = cm.sum() - (fp + fn + tp)
-print("True negative (for each class):", tn)
-print("\n")
+print(CRED +"[INFO] More results...\n"+CREDEND)
 
-fp = fp.astype(float)
-fn = fn.astype(float)
-tp = tp.astype(float)
-tn = tn.astype(float)
+print(CRED +"The following metrics represents the results per class, i.e.: "+CREDEND,list(lb.classes_), "\n")
 
-TPR = tp / (tp + fn)
-print("Sensitivity (for each class): ", TPR)
-TNR = tn / (tn + fp)
-print("Specificity (for each class): ", TNR)
-print("\n")
+print(CRED +"Confusion Matrix\n"+CREDEND, cm, "\n")
+print(CRED +"True positive for each class: "+CREDEND, true_positive)
+print(CRED +"False positive for each class: "+CREDEND, false_positive)
+print(CRED +"False negative for each class: "+CREDEND, false_negative)
+print(CRED +"True negative for each class: "+CREDEND, true_negative)
+TPR = true_positive.astype(float) / (true_positive.astype(float) + false_negative.astype(float))
+print(CRED +"\nSensitivity for each class: "+CREDEND, TPR)
+TNR = true_negative.astype(float) / (true_negative.astype(float) + false_positive.astype(float))
+print(CRED +"Specificity for each class: "+CREDEND, TNR)
+
 acc_NN = accuracy_score(testY.argmax(axis=1), predIdxs)
-print('Overall accuracy of Neural Network model:', acc_NN)
-print("\n")
+print(CRED +'\n Overall accuracy of Neural Network model: '+CREDEND, acc_NN)
 
+
+# ----------------- PLOTS - Confusion Matrix, ROC curves, Training/Validation Loss Accuracy -----------------
 
 # Confusion Matrix
 cm = confusion_matrix(testY.argmax(axis=1), predIdxs)
@@ -204,11 +188,10 @@ sns.heatmap(cm, xticklabels=labels, yticklabels=labels, annot=True, fmt='d', cma
 plt.title('Confusion Matrix')
 plt.ylabel('True Class')
 plt.xlabel('Predicted Class')
-plt.savefig("Confusion-Matrix"+params["dl_network"]+".pdf")
+plt.savefig("Confusion-Matrix " + params["dl_network"] + ".pdf")
+print(CRED +"[INFO] Confusion Matrix plot saved..."+CREDEND)
 
-
-
-# ROC curve
+# ROC curves
 y_score_new = model.predict(testX, batch_size=BS)
 n_classes = params["number_of_classes"]
 lw = 2
@@ -265,8 +248,8 @@ plt.ylim([0.0, 1.05])
 plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive Rate')
 plt.legend(loc="lower right")
-plt.savefig("ROC-curves"+params["dl_network"]+".pdf")
-
+plt.savefig("ROC-curves " + params["dl_network"] + ".pdf")
+print(CRED +"[INFO] ROC-curves plot saved..."+CREDEND)
 
 # Zoom in view of the upper left corner.
 plt.figure(2)
@@ -293,10 +276,10 @@ plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive Rate')
 # plt.title('Some extension of Receiver operating characteristic to multi-class')
 plt.legend(loc="lower right")
-plt.savefig("ROC-curves-zoomed"+params["dl_network"]+".pdf")
+plt.savefig("ROC-curves-zoomed" + params["dl_network"] + ".pdf")
+print(CRED +"[INFO] ROC-curves zoomed plot saved..."+CREDEND)
 
-
-# ACC - LOSS
+# Training/Validation Loss Accuracy
 plt.style.use("ggplot")
 plt.figure()
 N = EPOCHS
@@ -307,11 +290,11 @@ plt.plot(np.arange(0, N), H.history["val_accuracy"], label="Validation accuracy"
 plt.xlabel("Epoch")
 plt.ylabel("Loss/Accuracy")
 plt.legend(loc="lower left")
-plt.savefig("ACC-LOSS"+params["dl_network"]+".pdf")
-
+plt.savefig("ACC-LOSS " + params["dl_network"] + ".pdf")
+print(CRED +"[INFO] ACC-LOSS plot saved..."+CREDEND)
 
 # serialize the model to disk
-print("[INFO] saving model...")
+print(CRED +"[INFO] saving model..."+CREDEND)
 model.save(args["model"], save_format="h5")
 end = time.time()
-print("Execution Time (seconds):", end - start)
+print(CRED +"Total execution Time (sec):"+CREDEND, end - start)
