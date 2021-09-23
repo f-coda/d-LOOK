@@ -283,6 +283,7 @@ plt.legend(loc="lower left")
 plt.savefig("ACC-LOSS " + params["dl_network"] + ".pdf")
 print(CRED +"[INFO] ACC-LOSS plot saved..."+CREDEND)
 
+
 # serialize the model to disk
 print(CRED +"[INFO] saving model..."+CREDEND)
 model.save(args["model"], save_format="h5")
