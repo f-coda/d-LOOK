@@ -117,3 +117,6 @@ After the execution of the desired model, the following plots are created and sa
 - ROC curves zoomed in view of the upper left corner
 - Training/Validation Accuracy/Loss
 
+##### Dependencies
+
+- Python 3.6 Interpreter
