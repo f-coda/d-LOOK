@@ -1,5 +1,5 @@
 {
-	"epochs": 1,
+	"epochs": 15,
 	"batch_size": 8,
 	"test_size": 0.2,
 	"dropout_keep_prob": 0.4,
