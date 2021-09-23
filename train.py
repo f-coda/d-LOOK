@@ -59,17 +59,16 @@ BS = params["batch_size"]
 # the list of data (i.e., images) and class images
 start = time.time()
 print(CRED + "[INFO] loading images..." + CREDEND)
-imagePaths = list(paths.list_images(args["dataset"]))
+image_paths = list(paths.list_images(args["dataset"]))
 data = []
 labels = []
 
 # loop over the image paths
-for imagePath in imagePaths:
+for image_path in image_paths:
     # extract the class label from the filename
-    label = imagePath.split(os.path.sep)[-2].split(" ")
-    # load the image, swap color channels, and resize it to be a fixed
-    # 224x224 pixels while ignoring aspect ratio
-    image = cv2.imread(imagePath)
+    label = image_path.split(os.path.sep)[-2].split(" ")
+    # load the image, swap color channels, and resize it to be a fixed 224x224 pixels while ignoring aspect ratio
+    image = cv2.imread(image_path)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     image = cv2.resize(image, (224, 224))
     # update the data and labels lists, respectively
@@ -90,11 +89,7 @@ else:
     lb = MultiLabelBinarizer()
     labels = lb.fit_transform(labels)
 
-# print the list of classes
-# print("List of classes", list(lb.classes_))
-
-# partition the data into training and testing splits using 80% of
-# the data for training and the remaining 20% for testing
+# partition the data into training and testing
 (trainX, testX, trainY, testY) = train_test_split(data, labels,
                                                   test_size=params["test_size"], random_state=42)
 
@@ -104,7 +99,7 @@ trainAug = ImageDataGenerator(rotation_range=30, width_shift_range=0.1,
                               horizontal_flip=True, fill_mode="nearest")
 
 
-# load the DL network, ensuring the head FC layer sets are left
+# load the DL network, ensuring the head fully connected layer sets are left
 baseModel = eval(params["dl_network"])(weights="imagenet", include_top=False,
                              input_tensor=Input(shape=(224, 224, 3)))
 
@@ -116,15 +111,14 @@ headModel = Dense(64, activation=params["activation_function"])(headModel)
 headModel = Dropout(params["dropout_keep_prob"])(headModel)
 headModel = Dense(params["number_of_classes"], activation=params["activation_function_output"])(headModel)
 
-# place the head FC model on top of the base model (this will become
-# the actual model we will train)
+# place the head FC model on top of the base model (this will become the actual model we will train)
 model = Model(inputs=baseModel.input, outputs=headModel)
 
-# loop over all layers in the base model and freeze them so they will *not* be updated during the first training process
+# loop over all layers in the base model and freeze them so they will not be updated during the first training process
 for layer in baseModel.layers:
     layer.trainable = False
 
-# compile our model
+# compile the model
 print(CRED +"[INFO] compiling model..."+CREDEND)
 opt = eval(params["optimizer"])(lr=INIT_LR, decay=INIT_LR / EPOCHS)
 model.compile(loss=params["loss_function"], optimizer=opt,
@@ -132,7 +126,7 @@ model.compile(loss=params["loss_function"], optimizer=opt,
 
 # train the head of the network
 print(CRED +"[INFO] training head..."+CREDEND)
-H = model.fit_generator(
+dLOOKmodeler = model.fit_generator(
     trainAug.flow(trainX, trainY, batch_size=BS),
     steps_per_epoch=len(trainX) // BS,
     validation_data=(testX, testY),
@@ -151,17 +145,12 @@ print("\n\n" + classification_report(testY.argmax(axis=1), predIdxs) + "\n\n")
 
 # compute the confusion matrix and and use it to derive the raw accuracy, sensitivity, and specificity
 cm = confusion_matrix(testY.argmax(axis=1), predIdxs)
-total = sum(sum(cm))
-acc = (cm[0, 0] + cm[1, 1]) / total
-sensitivity = cm[0, 0] / (cm[0, 0] + cm[0, 1])
-specificity = cm[1, 1] / (cm[1, 0] + cm[1, 1])
 true_positive = np.diag(cm)
 false_positive = np.sum(cm, axis=0) - true_positive
 false_negative = np.sum(cm, axis=1) - true_positive
 true_negative = cm.sum() - (false_positive + false_negative + true_positive)
 
 print(CRED +"[INFO] More results...\n"+CREDEND)
-
 print(CRED +"The following metrics represents the results per class, i.e.: "+CREDEND,list(lb.classes_), "\n")
 
 print(CRED +"Confusion Matrix\n"+CREDEND, cm, "\n")
@@ -174,8 +163,9 @@ print(CRED +"\nSensitivity for each class: "+CREDEND, TPR)
 TNR = true_negative.astype(float) / (true_negative.astype(float) + false_positive.astype(float))
 print(CRED +"Specificity for each class: "+CREDEND, TNR)
 
+
 acc_NN = accuracy_score(testY.argmax(axis=1), predIdxs)
-print(CRED +'\n Overall accuracy of Neural Network model: '+CREDEND, acc_NN)
+print(CRED +'\nOverall accuracy of Neural Network model: '+CREDEND, acc_NN,"\n")
 
 
 # ----------------- PLOTS - Confusion Matrix, ROC curves, Training/Validation Loss Accuracy -----------------
@@ -283,10 +273,10 @@ print(CRED +"[INFO] ROC-curves zoomed plot saved..."+CREDEND)
 plt.style.use("ggplot")
 plt.figure()
 N = EPOCHS
-plt.plot(np.arange(0, N), H.history["loss"], label="Training loss")
-plt.plot(np.arange(0, N), H.history["val_loss"], label="Validation loss")
-plt.plot(np.arange(0, N), H.history["accuracy"], label="Training accuracy")
-plt.plot(np.arange(0, N), H.history["val_accuracy"], label="Validation accuracy")
+plt.plot(np.arange(0, N), dLOOKmodeler.history["loss"], label="Training loss")
+plt.plot(np.arange(0, N), dLOOKmodeler.history["val_loss"], label="Validation loss")
+plt.plot(np.arange(0, N), dLOOKmodeler.history["accuracy"], label="Training accuracy")
+plt.plot(np.arange(0, N), dLOOKmodeler.history["val_accuracy"], label="Validation accuracy")
 plt.xlabel("Epoch")
 plt.ylabel("Loss/Accuracy")
 plt.legend(loc="lower left")
