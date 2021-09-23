@@ -1,11 +1,10 @@
 ## d-LOOK (deep-Look)
 
 
-![d-LOOK](images/d-LOOK-logo.png)
-
 <p align="center">
-  <img width="460" height="300" src="https://github.com/AntonisMakris/d-LOOK/images/d-LOOK-logo.png">
+  <img width="200" height="200" src="https://user-images.githubusercontent.com/23379126/134471246-53f3b389-232b-43be-a651-ee44415583c1.png?raw=true" alt="Sublime's custom image"/>
 </p>
+
 
 ### What is d-LOOK
 
@@ -27,7 +26,7 @@ See more about Keras Models: [Keras Applications](https://keras.io/api/applicati
 ---
 
 #### Fine-tuning 
-d-LOOK is utilizing transfer learning and specifically fine-tuning. In fine-tuning, the fully connected layers of the pre-trained model are replaced with a new set of fully connected layers. These new layers are trained on a given data set, and the weights of the top layers of the pre-trained model along with the newly-added layers are “fine-tuned” by means of backpropagation. Thus, the weights are tuned from generic feature maps to features associated specifically with the provided data set.
+d-LOOK utilizes transfer learning and specifically fine-tuning. In fine-tuning, the fully connected layers of the pre-trained model are replaced with a new set of fully connected layers. These new layers are trained on a given data set, and the weights of the top layers of the pre-trained model along with the newly-added layers are “fine-tuned” by means of backpropagation. Thus, the weights are tuned from generic feature maps to features associated specifically with the provided data set.
 
 Fine-tuning is a multi-step process:
 
@@ -38,7 +37,7 @@ Fine-tuning is a multi-step process:
 5. Optionally unfreeze some/all of the convolutional layers in the network and perform a second pass of training.
 
 
-Below Figure is an example that illustrates the fine-tuning process on the VGG16 network.
+The figure below is an example that illustrates the fine-tuning process on the VGG16 network.
 The same process was applied to all provided deep learning models. The VGG16 model contains 13 convolutional and 3 fully connected layers.
 The final set of layers that contained the fully connected layers along with the softmax activation function is called the “head”.
 The network was instantiated with weights pre-trained on [ImageNet](https://www.image-net.org/) dataset, as shown at top of the figure. Afterwards, the fully connected layers were truncated, and the final pool layer was
@@ -53,8 +52,10 @@ intact. On the other hand, the fully connected head layer was randomly initializ
 focused on learning data set-specific features; thus, random values were able to destroy
 the learned features.
 
-![fine tuning](images/fine_tuning.jpg)
 
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/23379126/134471671-6668e665-de08-4621-a55e-513323d35173.jpg?raw=true" style="max-width: 70%;" />
+</p>
 
 ---
 #### Configuration File
@@ -72,25 +73,25 @@ In `parameters_config.json` file, several variables can be configured:
 	"loss_function": "",
 	"optimizer": "Adam"
 
-`epochs`: an arbitrary cutoff, generally defined as "one pass over the entire dataset", used to separate training into distinct phases, which is useful for logging and periodic evaluation
+> `epochs`: an arbitrary cutoff, generally defined as "one pass over the entire dataset", used to separate training into distinct phases, which is useful for logging and periodic evaluation
 
-`batch_size`: the number of training examples in one forward/backward pass. The higher the batch size, the more memory space you'll need
+> `batch_size`: the number of training examples in one forward/backward pass. The higher the batch size, the more memory space you'll need
 
-`test_size`: this parameter decides the size of the data that has to be split as the test dataset
+> `test_size`: this parameter decides the size of the data that has to be split as the test dataset
 
-`dropout_keep_prob`: the Dropout layer randomly sets input units to 0 with a frequency of rate at each step during training time, which helps prevent overfitting
+> `dropout_keep_prob`: the Dropout layer randomly sets input units to 0 with a frequency of rate at each step during training time, which helps prevent overfitting
 
-`number_of_classes`: the number of classes
+> `number_of_classes`: the number of classes
 
-`dl_network`: the Keras model (VGG16, ResNet50, etc.)
+> `dl_network`: the Keras model (VGG16, ResNet50, etc.)
 
-`activation_function`: the activation function is responsible for transforming the summed weighted input from the node into the activation of the node or output for that input
+> `activation_function`: the activation function is responsible for transforming the summed weighted input from the node into the activation of the node or output for that input
 
-`activation_function_output`: the activation function of the output layer
+> `activation_function_output`: the activation function of the output layer
 
-`loss_function`: the loss function, a scalar value that we attempt to minimize during our training of the model. 
+> `loss_function`: the loss function, a scalar value that we attempt to minimize during our training of the model. 
 
-`optimizer`: Optimizers are algorithms or methods used to change the attributes of the neural network such as weights and learning rate to reduce the losses
+>`optimizer`: Optimizers are algorithms or methods used to change the attributes of the neural network such as weights and learning rate to reduce the losses
 
 ---
 
@@ -99,12 +100,12 @@ In `parameters_config.json` file, several variables can be configured:
 
 ###### _General cmd_
 ```shell
-python train.py --d [dataset_path] --m [modelname (.model)] --c [config file]
+python train_model.py --d [dataset_path] --m [modelname (.model)] --c [config file]
 ```
 
 ###### _A local example cmd_
 ```shell
-Example:  python train.py --d /home/antonis/repos/d-LOOK/test_dataet/4hours/classes --m testmodel.model -c parameters_config.json
+Example:  python train_model.py --d /home/antonis/repos/d-LOOK/test_dataet/4hours/classes --m testmodel.model -c parameters_config.json
 ```
 
 
