@@ -44,7 +44,9 @@ The network was instantiated with weights pre-trained on [ImageNet](https://www.
 treated as a feature extractor, as depicted in the middle of the figure. Finally, the truncated
 layers were replaced by a new fully connected head layer, which was randomly initialized and placed
 on top of the original architecture (bottom of the figure). Then, the model was trained
-through a backpropagation process. The body of the network, i.e., the weights of the
+through a backpropagation process. 
+
+The body of the network, i.e., the weights of the
 convolutional layers of the pre-trained network, were frozen such that only the fully connected head layer
 was trained. This is because the convolutional layers had already learned discriminative filters
 and captured universal features like curves and edges; thus, these weights had to remain
