@@ -124,6 +124,8 @@ opt = eval(params["optimizer"])(lr=INIT_LR, decay=INIT_LR / EPOCHS)
 model.compile(loss=params["loss_function"], optimizer=opt,
               metrics=["accuracy"])
 
+early_stopping_callback = EarlyStopping(monitor='val_loss', patience=10)
+
 # train the head of the network
 print(CRED +"[INFO] training head..."+CREDEND)
 dLOOKmodeler = model.fit_generator(
@@ -131,7 +133,8 @@ dLOOKmodeler = model.fit_generator(
     steps_per_epoch=len(trainX) // BS,
     validation_data=(testX, testY),
     validation_steps=len(testX) // BS,
-    epochs=EPOCHS)
+    epochs=EPOCHS,
+    callbacks=[early_stopping_callback])
 
 # make predictions on the testing set
 print(CRED +"\n [INFO] evaluating network..."+CREDEND)
