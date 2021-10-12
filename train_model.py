@@ -13,6 +13,7 @@ from tensorflow.keras.applications import ResNet152V2
 from tensorflow.keras.applications import DenseNet201
 from tensorflow.keras.applications import NASNetLarge
 from tensorflow.keras.layers import AveragePooling2D
+from keras.callbacks import ModelCheckpoint, EarlyStopping
 from tensorflow.keras.layers import Dropout
 from tensorflow.keras.layers import Flatten
 from tensorflow.keras.layers import Dense
@@ -173,17 +174,6 @@ print(CRED +'\nOverall accuracy of Neural Network model: '+CREDEND, acc_NN,"\n")
 
 # ----------------- PLOTS - Confusion Matrix, ROC curves, Training/Validation Loss Accuracy -----------------
 
-# Confusion Matrix
-cm = confusion_matrix(testY.argmax(axis=1), predIdxs)
-labels = list(lb.classes_)
-plt.figure(figsize=(8, 6))
-sns.heatmap(cm, xticklabels=labels, yticklabels=labels, annot=True, fmt='d', cmap="Blues", vmin=0.2);
-plt.title('Confusion Matrix')
-plt.ylabel('True Class')
-plt.xlabel('Predicted Class')
-plt.savefig("Confusion-Matrix " + params["dl_network"] + ".pdf")
-print(CRED +"[INFO] Confusion Matrix plot saved..."+CREDEND)
-
 # ROC curves
 y_score_new = model.predict(testX, batch_size=BS)
 n_classes = params["number_of_classes"]
@@ -286,6 +276,16 @@ plt.legend(loc="lower left")
 plt.savefig("ACC-LOSS " + params["dl_network"] + ".pdf")
 print(CRED +"[INFO] ACC-LOSS plot saved..."+CREDEND)
 
+# Confusion Matrix
+cm = confusion_matrix(testY.argmax(axis=1), predIdxs)
+labels = list(lb.classes_)
+plt.figure(figsize=(8, 6))
+sns.heatmap(cm, xticklabels=labels, yticklabels=labels, annot=True, fmt='d', cmap="Blues", vmin=0.2);
+plt.title('Confusion Matrix')
+plt.ylabel('True Class')
+plt.xlabel('Predicted Class')
+plt.savefig("Confusion-Matrix " + params["dl_network"] + ".pdf")
+print(CRED +"[INFO] Confusion Matrix plot saved..."+CREDEND)
 
 # serialize the model to disk
 print(CRED +"[INFO] saving model..."+CREDEND)

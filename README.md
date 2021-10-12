@@ -106,7 +106,7 @@ python train_model.py --d [dataset_path] --m [modelname (.model)] --c [config fi
 
 ###### _A local example cmd_
 ```shell
-Example:  python train_model.py --d /home/antonis/repos/d-LOOK/test_dataset/4hours/classes --m testmodel.model -c parameters_config.json
+python train_model.py --d /home/antonis/repos/d-LOOK/test_dataset/classes/ --m testmodel.model -c parameters_config.json
 ```
 
 After the execution of the desired model, the following plots are created and saved:

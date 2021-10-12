@@ -4,7 +4,7 @@
 	"test_size": 0.2,
 	"dropout_keep_prob": 0.4,
 	"number_of_classes":3,
-	"dl_network":"VGG19",
+	"dl_network":"InceptionV3",
 	"activation_function": "relu",
 	"activation_function_output": "softmax",
 	"loss_function": "categorical_crossentropy",
