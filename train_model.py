@@ -266,6 +266,8 @@ print(CRED +"[INFO] ROC-curves zoomed plot saved..."+CREDEND)
 plt.style.use("ggplot")
 plt.figure()
 N = EPOCHS
+if early_stopping_callback.stopped_epoch != 0: # if training stopped early
+    N = early_stopping_callback.stopped_epoch + 1 # get the epoch at which it stopped
 plt.plot(np.arange(0, N), dLOOKmodeler.history["loss"], label="Training loss")
 plt.plot(np.arange(0, N), dLOOKmodeler.history["val_loss"], label="Validation loss")
 plt.plot(np.arange(0, N), dLOOKmodeler.history["accuracy"], label="Training accuracy")
