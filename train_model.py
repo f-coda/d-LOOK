@@ -115,7 +115,7 @@ headModel = Dense(params["number_of_classes"], activation=params["activation_fun
 # place the head FC model on top of the base model (this will become the actual model we will train)
 model = Model(inputs=baseModel.input, outputs=headModel)
 
-# loop over all layers in the base model and freeze them so they will not be updated during the first training process
+# loop over all layers in the base model and freeze them so they will not be updated during the first training process.
 for layer in baseModel.layers:
     layer.trainable = False
 
